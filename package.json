@@ -1,0 +1,14 @@
+{
+  "name": "scraping-harga-emas-antam",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pengumpul data historis harga emas ANTAM untuk aplikasi Streamlit",
+  "scripts": {
+    "scrape": "node scraper.js && python build_excel.py"
+  },
+  "dependencies": {
+    "puppeteer": "^24.16.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

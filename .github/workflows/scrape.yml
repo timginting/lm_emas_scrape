@@ -1,0 +1,45 @@
+name: Update gold prices
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 09:30 WIB, Monday-Saturday. ANTAM normally updates from 08:30 WIB.
+    - cron: "30 2 * * 1-6"
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          python -m pip install openpyxl==3.1.5
+
+      - name: Scrape and build Excel dataset
+        run: npm run scrape
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/antam_sell.json data/antam_buyback.json data/harga_emas_antam.xlsx
+          git diff --cached --quiet || git commit -m "Update ANTAM gold prices"
+          git push
